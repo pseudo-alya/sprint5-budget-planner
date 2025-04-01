@@ -1,0 +1,191 @@
+body {
+  font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-size: larger;
+  background: linear-gradient(135deg, #f0f7f4 0%, #e0ece8 100%);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  color: #2d3a3a;
+}
+
+.container {
+  width: 85%;
+  max-width: 1100px;
+  margin: 30px auto;
+  background: #fff;
+  padding: 30px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+}
+
+/* Enhanced Header with Image Optimization */
+header {
+  background: 
+      linear-gradient(rgba(86, 99, 87, 0.6), rgba(27, 94, 32, 0.7)), 
+      url('money-2.webp') center/cover no-repeat;
+  color: #ffffff;
+  padding: 100px 0;
+  text-align: center;
+  margin-bottom: 40px;
+  min-height: 40vh;
+  max-height: 500px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+header::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.2);
+  z-index: 0;
+}
+
+header h1 {
+  font-size: 3.5rem;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+  line-height: 1.2;
+  position: relative;
+  z-index: 2;
+}
+
+header p {
+  font-size: 1.5rem;
+  opacity: 0.95;
+  margin: 0 auto;
+  max-width: 800px;
+  padding: 0 20px;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
+  position: relative;
+  z-index: 2;
+}
+
+h2 {
+  color: #1b5e20;
+  border-bottom: 2px solid #a5d6a7;
+  padding-bottom: 8px;
+  margin-top: 25px;
+  font-size: 1.8rem;
+}
+
+section {
+  margin-bottom: 25px;
+  background: #f5fbf6;
+  padding: 20px;
+  border-radius: 8px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+section:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(46, 125, 50, 0.1);
+}
+
+ul {
+  margin: 15px 0;
+  padding-left: 0;
+  list-style-type: none;
+}
+
+ul li {
+  margin-bottom: 10px;
+  padding-left: 25px;
+  position: relative;
+}
+
+ul li:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  background-color: #4caf50;
+  border-radius: 50%;
+}
+
+ol {
+  margin: 15px 0;
+  padding-left: 25px;
+  counter-reset: item;
+}
+
+ol li {
+  counter-increment: item;
+  margin-bottom: 10px;
+  color: #1b5e20;
+}
+
+ol li:before {
+  content: counter(item) ".";
+  color: #4caf50;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.button-container {
+  text-align: center;
+  margin: 40px 0 20px;
+}
+
+button {
+  background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+  color: #fff;
+  padding: 12px 30px;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+button:hover {
+  background: linear-gradient(135deg, #57a85b 0%, #388e3c 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .container {
+    width: 95%;
+    padding: 20px 15px;
+  }
+  
+  header {
+    padding: 80px 20px;
+    min-height: 30vh;
+  }
+  
+  h1 {
+    font-size: 2.5rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+  
+  header p {
+    font-size: 1.2rem;
+  }
+}
+
+/* Mobile Fallback for Image */
+@media (max-width: 480px) {
+  header {
+    background: linear-gradient(rgba(46, 125, 50, 0.8), rgba(27, 94, 32, 0.9));
+  }
+}
