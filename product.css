@@ -1,0 +1,81 @@
+/* Basic reset and styling */
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
+header {
+  background: #333;
+  color: #fff;
+  padding: 20px 0;
+  text-align: center;
+}
+
+main {
+  width: 90%;
+  max-width: 1000px;
+  margin: 20px auto;
+  background: #fff;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+section {
+  margin-bottom: 30px;
+}
+
+h2, h3 {
+  margin-top: 0;
+}
+
+input, select, button {
+  padding: 10px;
+  margin: 5px 0;
+  font-size: 16px;
+}
+
+button {
+  cursor: pointer;
+  background: #333;
+  color: #fff;
+  border: none;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background: #555;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+table, th, td {
+  border: 1px solid #ccc;
+}
+
+th, td {
+  padding: 8px;
+  text-align: left;
+}
+
+/* Responsive design for smaller devices */
+@media (max-width: 600px) {
+  main {
+    width: 95%;
+    padding: 10px;
+  }
+  
+  table, th, td {
+    font-size: 14px;
+  }
+
+  input, select, button {
+    font-size: 14px;
+  }
+}
