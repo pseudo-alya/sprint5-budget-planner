@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Expense Tracker & Budget Planner</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Include Chart.js from CDN for rendering charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Expense Tracker & Budget Planner</h1>
+  </header>
+  <main>
+    <!-- Expense Entry Section -->
+    <section id="expense-form-section">
+      <h2>Enter Expenses</h2>
+      <form id="expense-form">
+        <input type="text" id="expense-description" placeholder="Description" required>
+        <input type="number" id="expense-amount" placeholder="Amount" required>
+        <select id="expense-category" required>
+          <option value="">Select Category</option>
+          <option value="Rent">Rent</option>
+          <option value="Food">Food</option>
+          <option value="Entertainment">Entertainment</option>
+          <option value="Utilities">Utilities</option>
+          <option value="Other">Other</option>
+        </select>
+        <button type="submit">Add Expense</button>
+      </form>
+      <div id="expenses-list">
+        <table id="expenses-table">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Amount</th>
+              <th>Category</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Dynamically populated expense rows -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Budget Entry Section -->
+    <section id="budget-form-section">
+      <h2>Set Budget</h2>
+      <form id="budget-form">
+        <input type="number" id="budget-amount" placeholder="Total Budget" required>
+        <select id="budget-period" required>
+          <option value="">Select Period</option>
+          <option value="Weekly">Weekly</option>
+          <option value="Monthly">Monthly</option>
+        </select>
+        <button type="submit">Set Budget</button>
+      </form>
+      <div id="budget-display">
+        <p id="budget-info"></p>
+      </div>
+    </section>
+
+    <!-- Calculation and Feedback Section -->
+    <section id="calculation-section">
+      <h2>Budget Calculation</h2>
+      <button id="calculate-btn">Calculate Budget Status</button>
+      <div id="result">
+        <p id="budget-status"></p>
+      </div>
+      <div id="suggestions">
+        <h3>Expense Reduction Suggestions:</h3>
+        <ul id="suggestions-list"></ul>
+      </div>
+    </section>
+
+    <!-- Chart Section -->
+    <section id="chart-section">
+      <h2>Expense Chart</h2>
+      <button id="toggle-chart">Toggle Chart Type</button>
+      <canvas id="expenseChart" width="400" height="400"></canvas>
+    </section>
+
+    <!-- CSV Export Section -->
+    <section id="export-section">
+      <h2>Export Expenses</h2>
+      <button id="export-btn">Export to CSV</button>
+    </section>
+  </main>
+  
+  <script src="app.js"></script>
+</body>
+</html>
