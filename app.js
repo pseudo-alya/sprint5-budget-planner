@@ -1,183 +1,178 @@
-// Arrays and variables to store expenses and budget info
+let budget = {
+  amount: 0,
+  period: ""
+};
+
 let expenses = [];
-let budget = null;
-let budgetPeriod = '';
-let currentChartType = 'pie';
-let expenseChart = null;
+let currentChartType = "pie";
 
-// Handle Expense Form Submission
-document.getElementById('expense-form').addEventListener('submit', function(e) {
+// ===== Budget Form Handling =====
+document.getElementById("budget-form").addEventListener("submit", function (e) {
   e.preventDefault();
-  const desc = document.getElementById('expense-description').value;
-  const amt = parseFloat(document.getElementById('expense-amount').value);
-  const cat = document.getElementById('expense-category').value;
-  
-  // Input validation (required fields already enforced by HTML, but we check number value)
-  if (!desc || isNaN(amt) || !cat) {
-    alert("Please fill all fields correctly.");
-    return;
-  }
-  
-  // Create expense object and add to expenses array
-  const expense = { id: Date.now(), description: desc, amount: amt, category: cat };
-  expenses.push(expense);
-  updateExpensesTable();
-  
-  // Reset form
-  this.reset();
+  const amount = parseFloat(document.getElementById("budget-amount").value);
+  const period = document.getElementById("budget-period").value;
+
+  if (isNaN(amount) || !period) return;
+
+  budget.amount = amount;
+  budget.period = period;
+
+  document.getElementById("budget-info").textContent = `Budget set: $${amount.toFixed(2)} (${period})`;
+  document.getElementById("budget-form").reset();
 });
 
-// Update Expenses Table
-function updateExpensesTable() {
-  const tbody = document.querySelector('#expenses-table tbody');
-  tbody.innerHTML = ''; // Clear existing rows
-  expenses.forEach(exp => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${exp.description}</td>
-      <td>${exp.amount.toFixed(2)}</td>
-      <td>${exp.category}</td>
-      <td>
-        <button onclick="editExpense(${exp.id})">Edit</button>
-        <button onclick="deleteExpense(${exp.id})">Delete</button>
-      </td>
+// ===== Expense Form Handling =====
+document.getElementById("expense-form").addEventListener("submit", function (e) {
+  e.preventDefault();
+  const description = document.getElementById("expense-description").value.trim();
+  const amount = parseFloat(document.getElementById("expense-amount").value);
+  const category = document.getElementById("expense-category").value;
+
+  if (!description || isNaN(amount) || !category) return;
+
+  expenses.push({ description, amount, category });
+  renderExpenses();
+  renderChart();
+  document.getElementById("expense-form").reset();
+});
+
+// ===== Render Expenses Table =====
+function renderExpenses() {
+  const tbody = document.querySelector("#expenses-table tbody");
+  tbody.innerHTML = "";
+
+  expenses.forEach((expense, index) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${expense.description}</td>
+      <td>$${expense.amount.toFixed(2)}</td>
+      <td>${expense.category}</td>
+      <td><button onclick="deleteExpense(${index})">Delete</button></td>
     `;
-    tbody.appendChild(tr);
+    tbody.appendChild(row);
   });
-  updateChart();
 }
 
-// Delete Expense
-function deleteExpense(id) {
-  expenses = expenses.filter(exp => exp.id !== id);
-  updateExpensesTable();
+// ===== Delete Expense Entry =====
+function deleteExpense(index) {
+  expenses.splice(index, 1);
+  renderExpenses();
+  renderChart();
 }
 
-// Edit Expense (a simple prompt implementation)
-function editExpense(id) {
-  const exp = expenses.find(exp => exp.id === id);
-  if (!exp) return;
-  const newDesc = prompt("Edit description:", exp.description);
-  const newAmt = parseFloat(prompt("Edit amount:", exp.amount));
-  const newCat = prompt("Edit category:", exp.category);
-  if (newDesc && !isNaN(newAmt) && newCat) {
-    exp.description = newDesc;
-    exp.amount = newAmt;
-    exp.category = newCat;
-    updateExpensesTable();
-  }
-}
+// ===== Calculate Budget Status & Suggestions =====
+document.getElementById("calculate-btn").addEventListener("click", calculateBudgetStatus);
 
-// Handle Budget Form Submission
-document.getElementById('budget-form').addEventListener('submit', function(e) {
-  e.preventDefault();
-  budget = parseFloat(document.getElementById('budget-amount').value);
-  budgetPeriod = document.getElementById('budget-period').value;
-  if (isNaN(budget) || !budgetPeriod) {
-    alert("Please provide a valid budget amount and period.");
-    return;
-  }
-  document.getElementById('budget-info').textContent = `Budget: $${budget.toFixed(2)} (${budgetPeriod})`;
-  this.reset();
-});
+function calculateBudgetStatus() {
+  const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
+  const difference = budget.amount - totalExpenses;
+  const statusElement = document.getElementById("budget-status");
+  const suggestionsList = document.getElementById("suggestions-list");
 
-// Handle Budget Calculation
-document.getElementById('calculate-btn').addEventListener('click', function() {
-  if (budget === null) {
-    alert("Please set your budget first.");
-    return;
-  }
-  const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
-  const statusEl = document.getElementById('budget-status');
-  
-  // Calculate remaining vs. exceeded budget
-  if (totalExpenses <= budget) {
-    statusEl.textContent = `You are within your budget. Remaining: $${(budget - totalExpenses).toFixed(2)}`;
-    statusEl.style.color = 'green';
-    document.getElementById('suggestions-list').innerHTML = '';
+  // Reset previous highlights and suggestions
+  document.querySelectorAll(".over-budget").forEach(row => {
+    row.classList.remove("over-budget");
+  });
+  suggestionsList.innerHTML = "";
+
+  if (difference >= 0) {
+    statusElement.textContent = `✅ You're within budget! Remaining: $${difference.toFixed(2)}`;
   } else {
-    statusEl.textContent = `You have exceeded your budget by $${(totalExpenses - budget).toFixed(2)}`;
-    statusEl.style.color = 'red';
-    displaySuggestions();
-  }
-});
+    statusElement.textContent = `⚠️ You're over budget by $${Math.abs(difference).toFixed(2)}. Consider cutting:`;
 
-// Provide expense reduction suggestions
-function displaySuggestions() {
-  const suggestions = [
-    "Review your food expenses for possible savings.",
-    "Cut down on non-essential entertainment costs.",
-    "Consider reducing utility usage or renegotiating bills."
-  ];
-  const ul = document.getElementById('suggestions-list');
-  ul.innerHTML = '';
-  suggestions.forEach(suggestion => {
-    const li = document.createElement('li');
-    li.textContent = suggestion;
-    ul.appendChild(li);
+    const priority = ["Entertainment", "Food", "Utilities", "Rent", "Other"];
+    let suggestedCategory = null;
+
+    for (let category of priority) {
+      const expensesInCategory = expenses.filter(e => e.category === category);
+      if (expensesInCategory.length > 0) {
+        suggestedCategory = category;
+
+        // Highlight one matching row
+        const rows = document.querySelectorAll("#expenses-table tbody tr");
+        for (let row of rows) {
+          const rowCategory = row.cells[2].textContent;
+          if (rowCategory === category) {
+            row.classList.add("over-budget");
+            break;
+          }
+        }
+
+        // Add suggestion
+        const categoryTotal = expensesInCategory.reduce((sum, e) => sum + e.amount, 0);
+        const suggestionItem = document.createElement("li");
+        suggestionItem.textContent = `${category} - $${categoryTotal.toFixed(2)}`;
+        suggestionsList.appendChild(suggestionItem);
+        break; // Only show the first matching suggestion
+      }
+    }
+
+    if (!suggestedCategory) {
+      const li = document.createElement("li");
+      li.textContent = "No suggestions available.";
+      suggestionsList.appendChild(li);
+    }
+  }
+}
+
+// ===== Chart.js Rendering =====
+let chart;
+
+function renderChart() {
+  const ctx = document.getElementById("expenseChart").getContext("2d");
+
+  if (chart) chart.destroy();
+
+  const categoryTotals = {};
+  expenses.forEach(e => {
+    categoryTotals[e.category] = (categoryTotals[e.category] || 0) + e.amount;
+  });
+
+  const labels = Object.keys(categoryTotals);
+  const data = Object.values(categoryTotals);
+
+  chart = new Chart(ctx, {
+    type: currentChartType,
+    data: {
+      labels: labels,
+      datasets: [{
+        label: "Expenses",
+        data: data,
+        backgroundColor: [
+          "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"
+        ]
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom' },
+      }
+    }
   });
 }
 
-// CSV Export Functionality (User Story #9)
-document.getElementById('export-btn').addEventListener('click', function() {
-  let csvContent = "Description,Amount,Category\r\n";
-  expenses.forEach(exp => {
-    csvContent += `${exp.description},${exp.amount},${exp.category}\r\n`;
+// ===== Toggle Chart Type =====
+document.getElementById("toggle-chart").addEventListener("click", () => {
+  currentChartType = currentChartType === "pie" ? "bar" : "pie";
+  renderChart();
+});
+
+// ===== Export to CSV =====
+document.getElementById("export-btn").addEventListener("click", function () {
+  if (expenses.length === 0) return;
+
+  let csvContent = "data:text/csv;charset=utf-8,Description,Amount,Category\n";
+  expenses.forEach(e => {
+    csvContent += `${e.description},${e.amount},${e.category}\n`;
   });
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+
+  const encodedUri = encodeURI(csvContent);
   const link = document.createElement("a");
-  const url = URL.createObjectURL(blob);
-  link.setAttribute("href", url);
+  link.setAttribute("href", encodedUri);
   link.setAttribute("download", "expenses.csv");
-  link.style.visibility = 'hidden';
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
 });
 
-// Chart Display Functionality (User Story #7)
-// Create or update the chart displaying expense data
-function updateChart() {
-  const ctx = document.getElementById('expenseChart').getContext('2d');
-  
-  // Aggregate expenses by category
-  const dataMap = {};
-  expenses.forEach(exp => {
-    dataMap[exp.category] = (dataMap[exp.category] || 0) + exp.amount;
-  });
-  const labels = Object.keys(dataMap);
-  const dataValues = Object.values(dataMap);
-  
-  // If chart exists, destroy it to update
-  if (expenseChart) {
-    expenseChart.destroy();
-  }
-  expenseChart = new Chart(ctx, {
-    type: currentChartType,
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Expenses by Category',
-        data: dataValues,
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.6)',
-          'rgba(54, 162, 235, 0.6)',
-          'rgba(255, 206, 86, 0.6)',
-          'rgba(75, 192, 192, 0.6)',
-          'rgba(153, 102, 255, 0.6)'
-        ],
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false
-    }
-  });
-}
-
-// Toggle Chart Type (User Story #7)
-document.getElementById('toggle-chart').addEventListener('click', function() {
-  currentChartType = (currentChartType === 'pie') ? 'bar' : 'pie';
-  updateChart();
-});
