@@ -30,6 +30,13 @@ section {
   margin-bottom: 15px;
 }
 
+/* Highlight rows that are over budget */
+.over-budget {
+  background-color: #ffe5e5;
+  font-weight: bold;
+  color: #b91c1c;
+}
+
 /* Form elements styling */
 input, select, button {
   padding: 6px;
@@ -69,15 +76,23 @@ th, td {
 #chart-section {
   text-align: center;
   padding: 10px;
+  
 }
 
 /* Force the chart to remain small and compact */
 #expenseChart {
-  width: 150px !important;
-  height: 150px !important;
+  width: 250px !important;
+  height: 250px !important;
   display: inline-block;
+  align-self: center;
 }
-
+.chart-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  width: 100%;
+}
 /* Responsive design adjustments for smaller screens */
 @media (max-width: 600px) {
   main {
@@ -91,8 +106,17 @@ th, td {
   table, th, td {
     font-size: 12px;
   }
+  .chart-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    width: 100%;
+  }
+  
   #expenseChart {
-    width: 120px !important;
-    height: 120px !important;
+    width: 700px;
+    height: 700px;
+    max-width: 100%;
   }
 }
