@@ -13,6 +13,23 @@
     <h1>Expense Tracker & Budget Planner</h1>
   </header>
   <main>
+      <!-- Budget Entry Section -->
+      <section id="budget-form-section">
+        <h2>Set Budget</h2>
+        <form id="budget-form">
+          <input type="number" id="budget-amount" placeholder="Total Budget" required>
+          <select id="budget-period" required>
+            <option value="">Select Period</option>
+            <option value="Weekly">Weekly</option>
+            <option value="Monthly">Monthly</option>
+          </select>
+          <button type="submit">Set Budget</button>
+        </form>
+        <div id="budget-display">
+          <p id="budget-info"></p>
+        </div>
+      </section>
+
     <!-- Expense Entry Section -->
     <section id="expense-form-section">
       <h2>Enter Expenses</h2>
@@ -46,23 +63,6 @@
       </div>
     </section>
 
-    <!-- Budget Entry Section -->
-    <section id="budget-form-section">
-      <h2>Set Budget</h2>
-      <form id="budget-form">
-        <input type="number" id="budget-amount" placeholder="Total Budget" required>
-        <select id="budget-period" required>
-          <option value="">Select Period</option>
-          <option value="Weekly">Weekly</option>
-          <option value="Monthly">Monthly</option>
-        </select>
-        <button type="submit">Set Budget</button>
-      </form>
-      <div id="budget-display">
-        <p id="budget-info"></p>
-      </div>
-    </section>
-
     <!-- Calculation and Feedback Section -->
     <section id="calculation-section">
       <h2>Budget Calculation</h2>
@@ -81,7 +81,9 @@
 <section id="chart-section">
   <h2>Expense Chart</h2>
   <button id="toggle-chart">Toggle Chart Type</button>
-  <canvas id="expenseChart" width="50" height="50"></canvas>
+  <div class="chart-container">
+    <canvas id="expenseChart"></canvas>
+  </div>
 </section>
 
 
