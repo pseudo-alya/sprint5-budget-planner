@@ -1,3 +1,4 @@
+/* Base Styles */
 body {
   font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   font-size: larger;
@@ -18,11 +19,11 @@ body {
   border-radius: 10px;
 }
 
-/* Enhanced Header with Image Optimization */
+/* Header */
 header {
-  background: 
-      linear-gradient(rgba(86, 99, 87, 0.6), rgba(27, 94, 32, 0.7)), 
-      url('money-2.webp') center/cover no-repeat;
+  background:
+    linear-gradient(rgba(86, 99, 87, 0.6), rgba(27, 94, 32, 0.7)),
+    url('money-2.webp') center/cover no-repeat;
   color: #ffffff;
   padding: 100px 0;
   text-align: center;
@@ -36,18 +37,13 @@ header {
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
-
 header::after {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0, 0, 0, 0.2);
   z-index: 0;
 }
-
 header h1 {
   font-size: 3.5rem;
   margin-bottom: 20px;
@@ -56,7 +52,6 @@ header h1 {
   position: relative;
   z-index: 2;
 }
-
 header p {
   font-size: 1.5rem;
   opacity: 0.95;
@@ -68,6 +63,7 @@ header p {
   z-index: 2;
 }
 
+/* Section Headings */
 h2 {
   color: #1b5e20;
   border-bottom: 2px solid #a5d6a7;
@@ -76,6 +72,7 @@ h2 {
   font-size: 1.8rem;
 }
 
+/* Sections */
 section {
   margin-bottom: 25px;
   background: #f5fbf6;
@@ -83,24 +80,22 @@ section {
   border-radius: 8px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-
 section:hover {
   transform: translateY(-3px);
   box-shadow: 0 5px 15px rgba(46, 125, 50, 0.1);
 }
 
+/* Lists */
 ul {
   margin: 15px 0;
   padding-left: 0;
   list-style-type: none;
 }
-
 ul li {
   margin-bottom: 10px;
   padding-left: 25px;
   position: relative;
 }
-
 ul li:before {
   content: "";
   position: absolute;
@@ -112,19 +107,16 @@ ul li:before {
   background-color: #4caf50;
   border-radius: 50%;
 }
-
 ol {
   margin: 15px 0;
   padding-left: 25px;
   counter-reset: item;
 }
-
 ol li {
   counter-increment: item;
   margin-bottom: 10px;
   color: #1b5e20;
 }
-
 ol li:before {
   content: counter(item) ".";
   color: #4caf50;
@@ -132,11 +124,11 @@ ol li:before {
   margin-right: 10px;
 }
 
+/* Buttons */
 .button-container {
   text-align: center;
   margin: 40px 0 20px;
 }
-
 button {
   background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
   color: #fff;
@@ -151,11 +143,47 @@ button {
   letter-spacing: 1px;
   font-weight: 600;
 }
-
 button:hover {
   background: linear-gradient(135deg, #57a85b 0%, #388e3c 100%);
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Expense Table Styling */
+#expenses-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 6px;
+}
+#expenses-table, 
+#expenses-table th, 
+#expenses-table td {
+  border: 1px solid #ccc;
+}
+#expenses-table th, 
+#expenses-table td {
+  padding: 6px;
+  text-align: left;
+}
+
+/* Highlight only the over‑budget row */
+#expenses-table tbody tr.over-budget td {
+  background-color: rgba(255, 0, 0, 0.2);
+}
+
+/* Chart Section */
+#chart-section {
+  text-align: center;
+  padding: 10px;
+}
+.chart-container {
+  display: inline-block;
+  width: 200px;   /* slightly wider */
+  height: auto;
+}
+#expenseChart {
+  width: 350px !important;
+  height: 300px !important;
 }
 
 /* Responsive Adjustments */
@@ -164,26 +192,41 @@ button:hover {
     width: 95%;
     padding: 20px 15px;
   }
-  
   header {
     padding: 80px 20px;
     min-height: 30vh;
   }
-  
-  h1 {
+  header h1 {
     font-size: 2.5rem;
   }
-  
   h2 {
     font-size: 1.5rem;
   }
-  
   header p {
     font-size: 1.2rem;
   }
 }
 
-/* Mobile Fallback for Image */
+@media (max-width: 600px) {
+  input, select, button {
+    font-size: 12px;
+    padding: 5px;
+  }
+  #expenses-table, 
+  #expenses-table th, 
+  #expenses-table td {
+    font-size: 12px;
+  }
+  .chart-container {
+    width: 150px;
+  }
+  #expenseChart {
+    width: 200px !important;
+    height: 150px !important;
+  }
+}
+
+/* Mobile Fallback for Header Image */
 @media (max-width: 480px) {
   header {
     background: linear-gradient(rgba(46, 125, 50, 0.8), rgba(27, 94, 32, 0.9));
