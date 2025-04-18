@@ -23,6 +23,7 @@ document.getElementById("expense-form").addEventListener("submit", function (e) 
   const amt = parseFloat(document.getElementById("expense-amount").value);
   const cat = document.getElementById("expense-category").value;
   if (!desc || isNaN(amt) || !cat) return;
+
   expenses.push({ description: desc, amount: amt, category: cat });
   renderExpenses();
   renderChart();
@@ -52,7 +53,7 @@ function deleteExpense(idx) {
   renderChart();
 }
 
-// ===== Calculate Budget Status =====
+// ===== Calculate Budget Status & Suggestions =====
 document.getElementById("calculate-btn").addEventListener("click", calculateBudgetStatus);
 
 function calculateBudgetStatus() {
@@ -61,29 +62,53 @@ function calculateBudgetStatus() {
   const totalExp = expenses.reduce((sum, e) => sum + e.amount, 0);
   const diff = budget.amount - totalExp;
 
-  // 1) Clear previous highlights
+  // 1) Clear prior highlights & suggestions
   document.querySelectorAll("#expenses-table tbody tr")
-    .forEach(r => r.classList.remove("over-budget"));
+    .forEach(row => row.classList.remove("over-budget"));
   suggList.innerHTML = "";
 
-  // 2) Show status
+  // 2) Show overall status
   if (diff >= 0) {
     statusEl.textContent = `✅ You're within budget! Remaining: $${diff.toFixed(2)}`;
+
+    // 3a) No single expense > budget – suggest 2 categories to reduce
+    const priority = ["Entertainment", "Utilities", "Food", "Rent"];
+    let count = 0;
+    for (let cat of priority) {
+      if (expenses.some(e => e.category === cat)) {
+        const li = document.createElement("li");
+        li.textContent = `Reduce ${cat}`;
+        suggList.appendChild(li);
+        count++;
+        if (count === 2) break;
+      }
+    }
+    if (count === 0) {
+      const li = document.createElement("li");
+      li.textContent = "No categories to suggest.";
+      suggList.appendChild(li);
+    }
+
   } else {
     statusEl.textContent = `⚠️ You're over budget by $${Math.abs(diff).toFixed(2)}.`;
 
-    // 3) Highlight any single expense > total budget
+    // 3b) Highlight each expense whose amount > total budget & suggest removal
     const rows = document.querySelectorAll("#expenses-table tbody tr");
     expenses.forEach((exp, i) => {
       if (exp.amount > budget.amount) {
         rows[i].classList.add("over-budget");
+        const li = document.createElement("li");
+        li.textContent = `Remove "${exp.description}" ($${exp.amount.toFixed(2)})`;
+        suggList.appendChild(li);
       }
     });
 
-    // 4) (Optional) simple suggestion
-    const li = document.createElement("li");
-    li.textContent = "Review large individual expenses.";
-    suggList.appendChild(li);
+    // If no single expense > budget (edge), fall back to category suggestions
+    if (suggList.childElementCount === 0) {
+      const li = document.createElement("li");
+      li.textContent = "No single expense exceeds the budget.";
+      suggList.appendChild(li);
+    }
   }
 }
 
@@ -97,7 +122,11 @@ function renderChart() {
     type: currentChartType,
     data: {
       labels: Object.keys(totals),
-      datasets: [{ label: "Expenses", data: Object.values(totals), backgroundColor: ['#FF6384','#36A2EB','#FFCE56','#4BC0C0','#9966FF'] }]
+      datasets: [{
+        label: "Expenses",
+        data: Object.values(totals),
+        backgroundColor: ['#FF6384','#36A2EB','#FFCE56','#4BC0C0','#9966FF']
+      }]
     },
     options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
   });
