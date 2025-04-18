@@ -166,11 +166,6 @@ button:hover {
   text-align: left;
 }
 
-/* Highlight only the over‑budget row */
-#expenses-table tbody tr.over-budget td {
-  background-color: rgba(255, 0, 0, 0.2);
-}
-
 /* Chart Section */
 #chart-section {
   text-align: center;
