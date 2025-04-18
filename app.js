@@ -3,7 +3,7 @@ let expenses = [];
 let currentChartType = "pie";
 let chart;
 
-// ===== Budget Form Handling =====
+// ===== Budget Form =====
 document.getElementById("budget-form").addEventListener("submit", function (e) {
   e.preventDefault();
   const amt = parseFloat(document.getElementById("budget-amount").value);
@@ -16,21 +16,19 @@ document.getElementById("budget-form").addEventListener("submit", function (e) {
   this.reset();
 });
 
-// ===== Expense Form Handling =====
+// ===== Expense Form =====
 document.getElementById("expense-form").addEventListener("submit", function (e) {
   e.preventDefault();
   const desc = document.getElementById("expense-description").value.trim();
   const amt = parseFloat(document.getElementById("expense-amount").value);
   const cat = document.getElementById("expense-category").value;
   if (!desc || isNaN(amt) || !cat) return;
-
   expenses.push({ description: desc, amount: amt, category: cat });
   renderExpenses();
   renderChart();
   this.reset();
 });
 
-// ===== Render Expenses Table =====
 function renderExpenses() {
   const tbody = document.querySelector("#expenses-table tbody");
   tbody.innerHTML = "";
@@ -46,14 +44,13 @@ function renderExpenses() {
   });
 }
 
-// ===== Delete Expense =====
 function deleteExpense(idx) {
   expenses.splice(idx, 1);
   renderExpenses();
   renderChart();
 }
 
-// ===== Calculate Budget Status & Suggestions =====
+// ===== Corrected Calculate Budget Status =====
 document.getElementById("calculate-btn").addEventListener("click", calculateBudgetStatus);
 
 function calculateBudgetStatus() {
@@ -62,16 +59,15 @@ function calculateBudgetStatus() {
   const totalExp = expenses.reduce((sum, e) => sum + e.amount, 0);
   const diff = budget.amount - totalExp;
 
-  // 1) Clear prior highlights & suggestions
+  // Clear previous highlights & suggestions
   document.querySelectorAll("#expenses-table tbody tr")
-    .forEach(row => row.classList.remove("over-budget"));
+    .forEach(r => r.classList.remove("over-budget"));
   suggList.innerHTML = "";
 
-  // 2) Show overall status
+  // Overall status message
   if (diff >= 0) {
     statusEl.textContent = `✅ You're within budget! Remaining: $${diff.toFixed(2)}`;
-
-    // 3a) No single expense > budget – suggest 2 categories to reduce
+    // No single expense above budget → suggest two categories
     const priority = ["Entertainment", "Utilities", "Food", "Rent"];
     let count = 0;
     for (let cat of priority) {
@@ -79,8 +75,7 @@ function calculateBudgetStatus() {
         const li = document.createElement("li");
         li.textContent = `Reduce ${cat}`;
         suggList.appendChild(li);
-        count++;
-        if (count === 2) break;
+        if (++count === 2) break;
       }
     }
     if (count === 0) {
@@ -92,7 +87,7 @@ function calculateBudgetStatus() {
   } else {
     statusEl.textContent = `⚠️ You're over budget by $${Math.abs(diff).toFixed(2)}.`;
 
-    // 3b) Highlight each expense whose amount > total budget & suggest removal
+    // Highlight & suggest **every** expense > budget
     const rows = document.querySelectorAll("#expenses-table tbody tr");
     expenses.forEach((exp, i) => {
       if (exp.amount > budget.amount) {
@@ -103,21 +98,30 @@ function calculateBudgetStatus() {
       }
     });
 
-    // If no single expense > budget (edge), fall back to category suggestions
+    // If none individually > budget (edge case), fall back to two-category suggestion
     if (suggList.childElementCount === 0) {
-      const li = document.createElement("li");
-      li.textContent = "No single expense exceeds the budget.";
-      suggList.appendChild(li);
+      const fallback = ["Entertainment", "Utilities", "Food", "Rent"];
+      let cnt = 0;
+      for (let cat of fallback) {
+        if (expenses.some(e => e.category === cat)) {
+          const li = document.createElement("li");
+          li.textContent = `Reduce ${cat}`;
+          suggList.appendChild(li);
+          if (++cnt === 2) break;
+        }
+      }
     }
   }
 }
 
-// ===== Chart.js Rendering =====
+// ===== Chart Rendering =====
 function renderChart() {
   const ctx = document.getElementById("expenseChart").getContext("2d");
   if (chart) chart.destroy();
+
   const totals = {};
   expenses.forEach(e => totals[e.category] = (totals[e.category] || 0) + e.amount);
+
   chart = new Chart(ctx, {
     type: currentChartType,
     data: {
@@ -128,17 +132,18 @@ function renderChart() {
         backgroundColor: ['#FF6384','#36A2EB','#FFCE56','#4BC0C0','#9966FF']
       }]
     },
-    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'bottom' } }
+    }
   });
 }
 
-// ===== Toggle Chart Type =====
 document.getElementById("toggle-chart").addEventListener("click", () => {
   currentChartType = currentChartType === "pie" ? "bar" : "pie";
   renderChart();
 });
 
-// ===== Export to CSV =====
 document.getElementById("export-btn").addEventListener("click", () => {
   if (!expenses.length) return;
   let csv = "data:text/csv;charset=utf-8,Description,Amount,Category\n";
