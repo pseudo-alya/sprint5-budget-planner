@@ -58,16 +58,17 @@ function calculateBudgetStatus() {
   const suggList = document.getElementById("suggestions-list");
   const totalExp = expenses.reduce((sum, e) => sum + e.amount, 0);
   const diff = budget.amount - totalExp;
+  const rows = document.querySelectorAll("#expenses-table tbody tr");
 
   // Clear previous highlights & suggestions
-  document.querySelectorAll("#expenses-table tbody tr")
-    .forEach(r => r.classList.remove("over-budget"));
+  rows.forEach(r => r.classList.remove("over-budget"));
   suggList.innerHTML = "";
 
   // Overall status message
   if (diff >= 0) {
     statusEl.textContent = `✅ You're within budget! Remaining: $${diff.toFixed(2)}`;
-    // No single expense above budget → suggest two categories
+
+    // Suggest two categories in priority order
     const priority = ["Entertainment", "Utilities", "Food", "Rent"];
     let count = 0;
     for (let cat of priority) {
@@ -87,10 +88,11 @@ function calculateBudgetStatus() {
   } else {
     statusEl.textContent = `⚠️ You're over budget by $${Math.abs(diff).toFixed(2)}.`;
 
-    // Highlight & suggest **every** expense > budget
-    const rows = document.querySelectorAll("#expenses-table tbody tr");
+    // Highlight & suggest every expense whose amount > total budget
+    let anyOver = false;
     expenses.forEach((exp, i) => {
       if (exp.amount > budget.amount) {
+        anyOver = true;
         rows[i].classList.add("over-budget");
         const li = document.createElement("li");
         li.textContent = `Remove "${exp.description}" ($${exp.amount.toFixed(2)})`;
@@ -98,8 +100,8 @@ function calculateBudgetStatus() {
       }
     });
 
-    // If none individually > budget (edge case), fall back to two-category suggestion
-    if (suggList.childElementCount === 0) {
+    // If none individually > budget, fallback to two-category suggestion
+    if (!anyOver) {
       const fallback = ["Entertainment", "Utilities", "Food", "Rent"];
       let cnt = 0;
       for (let cat of fallback) {
@@ -114,7 +116,7 @@ function calculateBudgetStatus() {
   }
 }
 
-// ===== Chart Rendering =====
+// ===== Chart.js Rendering =====
 function renderChart() {
   const ctx = document.getElementById("expenseChart").getContext("2d");
   if (chart) chart.destroy();
@@ -139,11 +141,13 @@ function renderChart() {
   });
 }
 
+// Toggle Chart Type
 document.getElementById("toggle-chart").addEventListener("click", () => {
   currentChartType = currentChartType === "pie" ? "bar" : "pie";
   renderChart();
 });
 
+// Export to CSV
 document.getElementById("export-btn").addEventListener("click", () => {
   if (!expenses.length) return;
   let csv = "data:text/csv;charset=utf-8,Description,Amount,Category\n";
