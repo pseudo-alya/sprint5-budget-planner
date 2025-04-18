@@ -1,154 +1,105 @@
-let budget = {
-  amount: 0,
-  period: ""
-};
-
+let budget = { amount: 0, period: "" };
 let expenses = [];
 let currentChartType = "pie";
+let chart;
 
 // ===== Budget Form Handling =====
 document.getElementById("budget-form").addEventListener("submit", function (e) {
   e.preventDefault();
-  const amount = parseFloat(document.getElementById("budget-amount").value);
-  const period = document.getElementById("budget-period").value;
-
-  if (isNaN(amount) || !period) return;
-
-  budget.amount = amount;
-  budget.period = period;
-
-  document.getElementById("budget-info").textContent = `Budget set: $${amount.toFixed(2)} (${period})`;
-  document.getElementById("budget-form").reset();
+  const amt = parseFloat(document.getElementById("budget-amount").value);
+  const per = document.getElementById("budget-period").value;
+  if (isNaN(amt) || !per) return;
+  budget.amount = amt;
+  budget.period = per;
+  document.getElementById("budget-info").textContent =
+    `Budget set: $${amt.toFixed(2)} (${per})`;
+  this.reset();
 });
 
 // ===== Expense Form Handling =====
 document.getElementById("expense-form").addEventListener("submit", function (e) {
   e.preventDefault();
-  const description = document.getElementById("expense-description").value.trim();
-  const amount = parseFloat(document.getElementById("expense-amount").value);
-  const category = document.getElementById("expense-category").value;
-
-  if (!description || isNaN(amount) || !category) return;
-
-  expenses.push({ description, amount, category });
+  const desc = document.getElementById("expense-description").value.trim();
+  const amt = parseFloat(document.getElementById("expense-amount").value);
+  const cat = document.getElementById("expense-category").value;
+  if (!desc || isNaN(amt) || !cat) return;
+  expenses.push({ description: desc, amount: amt, category: cat });
   renderExpenses();
   renderChart();
-  document.getElementById("expense-form").reset();
+  this.reset();
 });
 
 // ===== Render Expenses Table =====
 function renderExpenses() {
   const tbody = document.querySelector("#expenses-table tbody");
   tbody.innerHTML = "";
-
-  expenses.forEach((expense, index) => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${expense.description}</td>
-      <td>$${expense.amount.toFixed(2)}</td>
-      <td>${expense.category}</td>
-      <td><button onclick="deleteExpense(${index})">Delete</button></td>
+  expenses.forEach((exp, i) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${exp.description}</td>
+      <td>$${exp.amount.toFixed(2)}</td>
+      <td>${exp.category}</td>
+      <td><button onclick="deleteExpense(${i})">Delete</button></td>
     `;
-    tbody.appendChild(row);
+    tbody.appendChild(tr);
   });
 }
 
-// ===== Delete Expense Entry =====
-function deleteExpense(index) {
-  expenses.splice(index, 1);
+// ===== Delete Expense =====
+function deleteExpense(idx) {
+  expenses.splice(idx, 1);
   renderExpenses();
   renderChart();
 }
 
-// ===== Calculate Budget Status & Suggestions =====
+// ===== Calculate Budget Status =====
 document.getElementById("calculate-btn").addEventListener("click", calculateBudgetStatus);
 
 function calculateBudgetStatus() {
-  const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
-  const difference = budget.amount - totalExpenses;
-  const statusElement = document.getElementById("budget-status");
-  const suggestionsList = document.getElementById("suggestions-list");
+  const statusEl = document.getElementById("budget-status");
+  const suggList = document.getElementById("suggestions-list");
+  const totalExp = expenses.reduce((sum, e) => sum + e.amount, 0);
+  const diff = budget.amount - totalExp;
 
-  // Reset previous highlights and suggestions
-  document.querySelectorAll(".over-budget").forEach(row => {
-    row.classList.remove("over-budget");
-  });
-  suggestionsList.innerHTML = "";
+  // 1) Clear previous highlights
+  document.querySelectorAll("#expenses-table tbody tr")
+    .forEach(r => r.classList.remove("over-budget"));
+  suggList.innerHTML = "";
 
-  if (difference >= 0) {
-    statusElement.textContent = `✅ You're within budget! Remaining: $${difference.toFixed(2)}`;
+  // 2) Show status
+  if (diff >= 0) {
+    statusEl.textContent = `✅ You're within budget! Remaining: $${diff.toFixed(2)}`;
   } else {
-    statusElement.textContent = `⚠️ You're over budget by $${Math.abs(difference).toFixed(2)}. Consider cutting:`;
+    statusEl.textContent = `⚠️ You're over budget by $${Math.abs(diff).toFixed(2)}.`;
 
-    const priority = ["Entertainment", "Food", "Utilities", "Rent", "Other"];
-    let suggestedCategory = null;
-
-    for (let category of priority) {
-      const expensesInCategory = expenses.filter(e => e.category === category);
-      if (expensesInCategory.length > 0) {
-        suggestedCategory = category;
-
-        // Highlight one matching row
-        const rows = document.querySelectorAll("#expenses-table tbody tr");
-        for (let row of rows) {
-          const rowCategory = row.cells[2].textContent;
-          if (rowCategory === category) {
-            row.classList.add("over-budget");
-            break;
-          }
-        }
-
-        // Add suggestion
-        const categoryTotal = expensesInCategory.reduce((sum, e) => sum + e.amount, 0);
-        const suggestionItem = document.createElement("li");
-        suggestionItem.textContent = `${category} - $${categoryTotal.toFixed(2)}`;
-        suggestionsList.appendChild(suggestionItem);
-        break; // Only show the first matching suggestion
+    // 3) Highlight any single expense > total budget
+    const rows = document.querySelectorAll("#expenses-table tbody tr");
+    expenses.forEach((exp, i) => {
+      if (exp.amount > budget.amount) {
+        rows[i].classList.add("over-budget");
       }
-    }
+    });
 
-    if (!suggestedCategory) {
-      const li = document.createElement("li");
-      li.textContent = "No suggestions available.";
-      suggestionsList.appendChild(li);
-    }
+    // 4) (Optional) simple suggestion
+    const li = document.createElement("li");
+    li.textContent = "Review large individual expenses.";
+    suggList.appendChild(li);
   }
 }
 
 // ===== Chart.js Rendering =====
-let chart;
-
 function renderChart() {
   const ctx = document.getElementById("expenseChart").getContext("2d");
-
   if (chart) chart.destroy();
-
-  const categoryTotals = {};
-  expenses.forEach(e => {
-    categoryTotals[e.category] = (categoryTotals[e.category] || 0) + e.amount;
-  });
-
-  const labels = Object.keys(categoryTotals);
-  const data = Object.values(categoryTotals);
-
+  const totals = {};
+  expenses.forEach(e => totals[e.category] = (totals[e.category] || 0) + e.amount);
   chart = new Chart(ctx, {
     type: currentChartType,
     data: {
-      labels: labels,
-      datasets: [{
-        label: "Expenses",
-        data: data,
-        backgroundColor: [
-          "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"
-        ]
-      }]
+      labels: Object.keys(totals),
+      datasets: [{ label: "Expenses", data: Object.values(totals), backgroundColor: ['#FF6384','#36A2EB','#FFCE56','#4BC0C0','#9966FF'] }]
     },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { position: 'bottom' },
-      }
-    }
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
   });
 }
 
@@ -159,20 +110,14 @@ document.getElementById("toggle-chart").addEventListener("click", () => {
 });
 
 // ===== Export to CSV =====
-document.getElementById("export-btn").addEventListener("click", function () {
-  if (expenses.length === 0) return;
-
-  let csvContent = "data:text/csv;charset=utf-8,Description,Amount,Category\n";
-  expenses.forEach(e => {
-    csvContent += `${e.description},${e.amount},${e.category}\n`;
-  });
-
-  const encodedUri = encodeURI(csvContent);
+document.getElementById("export-btn").addEventListener("click", () => {
+  if (!expenses.length) return;
+  let csv = "data:text/csv;charset=utf-8,Description,Amount,Category\n";
+  expenses.forEach(e => csv += `${e.description},${e.amount},${e.category}\n`);
   const link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
-  link.setAttribute("download", "expenses.csv");
+  link.href = encodeURI(csv);
+  link.download = "expenses.csv";
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
 });
-
