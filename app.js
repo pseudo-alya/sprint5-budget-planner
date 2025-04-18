@@ -50,8 +50,10 @@ function deleteExpense(idx) {
   renderChart();
 }
 
-// ===== Corrected Calculate Budget Status =====
-document.getElementById("calculate-btn").addEventListener("click", calculateBudgetStatus);
+// ===== Calculate Budget Status & Suggestions =====
+document
+  .getElementById("calculate-btn")
+  .addEventListener("click", calculateBudgetStatus);
 
 function calculateBudgetStatus() {
   const statusEl = document.getElementById("budget-status");
@@ -60,59 +62,71 @@ function calculateBudgetStatus() {
   const diff = budget.amount - totalExp;
   const rows = document.querySelectorAll("#expenses-table tbody tr");
 
-  // Clear previous highlights & suggestions
-  rows.forEach(r => r.classList.remove("over-budget"));
+  // 1) Clear previous highlights & suggestions
+  rows.forEach((r) => r.classList.remove("over-budget"));
   suggList.innerHTML = "";
 
-  // Overall status message
+  // 2) Show overall status
   if (diff >= 0) {
-    statusEl.textContent = `✅ You're within budget! Remaining: $${diff.toFixed(2)}`;
+    statusEl.textContent = `✅ You're within budget! Remaining: $${diff.toFixed(
+      2
+    )}`;
 
-    // Suggest two categories in priority order
-    const priority = ["Entertainment", "Utilities", "Food", "Rent"];
-    let count = 0;
-    for (let cat of priority) {
-      if (expenses.some(e => e.category === cat)) {
-        const li = document.createElement("li");
-        li.textContent = `Reduce ${cat}`;
-        suggList.appendChild(li);
-        if (++count === 2) break;
-      }
-    }
-    if (count === 0) {
-      const li = document.createElement("li");
-      li.textContent = "No categories to suggest.";
-      suggList.appendChild(li);
-    }
-
+    // Case 2 fallback: all individual <= budget but sum <= budget → no suggestions
+    return;
   } else {
-    statusEl.textContent = `⚠️ You're over budget by $${Math.abs(diff).toFixed(2)}.`;
+    statusEl.textContent = `⚠️ You're over budget by $${Math.abs(
+      diff
+    ).toFixed(2)}. Consider cutting:`;
+  }
 
-    // Highlight & suggest every expense whose amount > total budget
-    let anyOver = false;
-    expenses.forEach((exp, i) => {
-      if (exp.amount > budget.amount) {
-        anyOver = true;
-        rows[i].classList.add("over-budget");
-        const li = document.createElement("li");
-        li.textContent = `Remove "${exp.description}" ($${exp.amount.toFixed(2)})`;
-        suggList.appendChild(li);
-      }
+  // 3) Case 1: Are there any expenses > total budget?
+  const overItems = expenses
+    .map((exp, i) => ({ exp, i }))
+    .filter(({ exp }) => exp.amount > budget.amount);
+
+  if (overItems.length > 0) {
+    // Highlight & suggest each
+    overItems.forEach(({ exp, i }) => {
+      rows[i].classList.add("over-budget");
+      const li = document.createElement("li");
+      li.textContent = `Remove "${exp.description}" ($${exp.amount.toFixed(
+        2
+      )})`;
+      suggList.appendChild(li);
     });
+    return;
+  }
 
-    // If none individually > budget, fallback to two-category suggestion
-    if (!anyOver) {
-      const fallback = ["Entertainment", "Utilities", "Food", "Rent"];
-      let cnt = 0;
-      for (let cat of fallback) {
-        if (expenses.some(e => e.category === cat)) {
-          const li = document.createElement("li");
-          li.textContent = `Reduce ${cat}`;
-          suggList.appendChild(li);
-          if (++cnt === 2) break;
-        }
-      }
+  // 4) Case 2: sum > budget but no single expense > budget
+  //    Suggest 2 expenses in this category priority, picking the largest in each
+  const priority = ["Other", "Entertainment", "Utilities", "Food", "Rent"];
+  let suggested = 0;
+  for (let cat of priority) {
+    if (suggested >= 2) break;
+    // find all in this category
+    const candidates = expenses
+      .map((exp, i) => ({ exp, i }))
+      .filter(({ exp }) => exp.category === cat);
+    if (candidates.length) {
+      // pick largest
+      candidates.sort((a, b) => b.exp.amount - a.exp.amount);
+      const { exp, i } = candidates[0];
+      rows[i].classList.add("over-budget");
+      const li = document.createElement("li");
+      li.textContent = `Remove "${exp.description}" ($${exp.amount.toFixed(
+        2
+      )})`;
+      suggList.appendChild(li);
+      suggested++;
     }
+  }
+
+  // If still none (edge), say no suggestions
+  if (suggested === 0) {
+    const li = document.createElement("li");
+    li.textContent = "No suggestions available.";
+    suggList.appendChild(li);
   }
 }
 
@@ -120,38 +134,38 @@ function calculateBudgetStatus() {
 function renderChart() {
   const ctx = document.getElementById("expenseChart").getContext("2d");
   if (chart) chart.destroy();
-
   const totals = {};
-  expenses.forEach(e => totals[e.category] = (totals[e.category] || 0) + e.amount);
-
+  expenses.forEach((e) => (totals[e.category] = (totals[e.category] || 0) + e.amount));
   chart = new Chart(ctx, {
     type: currentChartType,
     data: {
       labels: Object.keys(totals),
-      datasets: [{
-        label: "Expenses",
-        data: Object.values(totals),
-        backgroundColor: ['#FF6384','#36A2EB','#FFCE56','#4BC0C0','#9966FF']
-      }]
+      datasets: [
+        {
+          label: "Expenses",
+          data: Object.values(totals),
+          backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"],
+        },
+      ],
     },
     options: {
       responsive: true,
-      plugins: { legend: { position: 'bottom' } }
-    }
+      plugins: { legend: { position: "bottom" } },
+    },
   });
 }
 
-// Toggle Chart Type
+// ===== Toggle Chart Type =====
 document.getElementById("toggle-chart").addEventListener("click", () => {
   currentChartType = currentChartType === "pie" ? "bar" : "pie";
   renderChart();
 });
 
-// Export to CSV
+// ===== Export to CSV =====
 document.getElementById("export-btn").addEventListener("click", () => {
   if (!expenses.length) return;
   let csv = "data:text/csv;charset=utf-8,Description,Amount,Category\n";
-  expenses.forEach(e => csv += `${e.description},${e.amount},${e.category}\n`);
+  expenses.forEach((e) => (csv += `${e.description},${e.amount},${e.category}\n`));
   const link = document.createElement("a");
   link.href = encodeURI(csv);
   link.download = "expenses.csv";
