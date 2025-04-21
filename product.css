@@ -1,122 +1,198 @@
-/* Reduced overall margins and padding for a compact design */
+/* Modern Money-Themed CSS - Professional Version */
+:root {
+  --primary-green: #2e7d32;
+  --secondary-green: #388e3c;
+  --light-green: #8bc34a;
+  --lighter-green: #dcedc8;
+  --dark-green: #1b5e20;
+  --money-gold: #d4af37;
+  --white: #ffffff;
+  --light-gray: #f5f5f5;
+  --dark-text: #333333;
+  --border-radius: 6px;
+}
+
 body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: var(--dark-text);
+  background-color: var(--light-gray);
   margin: 0;
   padding: 0;
-  font-family: Arial, sans-serif;
-  background: #f4f4f4;
-  line-height: 1.6;
+  background-image: linear-gradient(135deg, var(--lighter-green) 0%, var(--light-gray) 100%);
 }
 
-/* Header styling */
 header {
-  background: #333;
-  color: #fff;
-  padding: 10px 0;
+  background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+  color: var(--white);
   text-align: center;
+  padding: 2rem 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
 }
 
-/* Main container with reduced width, margin, and padding */
+header h1 {
+  font-size: 2.2rem;
+  margin: 0;
+  font-weight: 600;
+}
+
 main {
-  width: 90%;
-  max-width: 800px;  /* narrower width helps everything fit on one screen */
-  margin: 10px auto;
-  background: #fff;
-  padding: 10px;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.5rem;
 }
 
-/* Tighter spacing between sections */
 section {
-  margin-bottom: 15px;
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-top: 4px solid var(--primary-green);
 }
 
-/* Highlight rows that are over budget */
-.over-budget {
-  background-color: #ffe5e5;
-  font-weight: bold;
-  color: #b91c1c;
+h2 {
+  color: var(--primary-green);
+  margin-top: 0;
+  margin-bottom: 1.2rem;
+  font-size: 1.4rem;
+  font-weight: 600;
 }
 
-/* Form elements styling */
-input, select, button {
-  padding: 6px;
-  margin: 4px 0;
-  font-size: 14px;
+h3 {
+  color: var(--dark-green);
+  font-size: 1.2rem;
+  margin-bottom: 0.8rem;
+}
+
+form {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+input, select {
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--light-green);
+  box-shadow: 0 0 0 2px rgba(139, 195, 74, 0.2);
 }
 
 button {
-  cursor: pointer;
-  background: #333;
-  color: #fff;
+  background: linear-gradient(to right, var(--primary-green), var(--secondary-green));
+  color: white;
   border: none;
-  transition: background 0.3s ease;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
 }
 
 button:hover {
-  background: #555;
+  background: linear-gradient(to right, var(--secondary-green), var(--primary-green));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Table styling */
-table {
+#expenses-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 6px;
+  margin-top: 1rem;
 }
 
-table, th, td {
-  border: 1px solid #ccc;
-}
-
-th, td {
-  padding: 6px;
+#expenses-table th {
+  background-color: var(--lighter-green);
+  color: var(--dark-green);
   text-align: left;
+  padding: 0.8rem;
 }
 
-/* Chart section adjustments */
-#chart-section {
-  text-align: center;
-  padding: 10px;
-  
+#expenses-table td {
+  padding: 0.8rem;
+  border-bottom: 1px solid #eee;
 }
 
-/* Force the chart to remain small and compact */
-#expenseChart {
-  width: 250px !important;
-  height: 250px !important;
-  display: inline-block;
-  align-self: center;
+#expenses-table tr:hover {
+  background-color: rgba(139, 195, 74, 0.1);
 }
+
 .chart-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
-  width: 100%;
+  position: relative;
+  height: 300px;
+  margin-top: 1rem;
 }
-/* Responsive design adjustments for smaller screens */
-@media (max-width: 600px) {
+
+#budget-display, #result {
+  background-color: var(--lighter-green);
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  margin-top: 1rem;
+}
+
+#budget-info, #budget-status {
+  margin: 0;
+  font-weight: 500;
+  color: var(--dark-green);
+}
+
+#suggestions-list {
+  padding-left: 1.2rem;
+}
+
+#suggestions-list li {
+  margin-bottom: 0.5rem;
+  position: relative;
+  padding-left: 1rem;
+}
+
+#suggestions-list li::before {
+  content: "•";
+  color: var(--money-gold);
+  position: absolute;
+  left: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
   main {
-    width: 95%;
-    padding: 8px;
-  }
-  input, select, button {
-    font-size: 12px;
-    padding: 5px;
-  }
-  table, th, td {
-    font-size: 12px;
-  }
-  .chart-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 20px;
-    width: 100%;
+    grid-template-columns: 1fr;
+    padding: 0 1rem;
   }
   
-  #expenseChart {
-    width: 700px;
-    height: 700px;
-    max-width: 100%;
+  header {
+    padding: 1.5rem 0;
   }
+  
+  header h1 {
+    font-size: 1.8rem;
+  }
+  
+  section {
+    padding: 1.2rem;
+  }
+}
+
+/* Special status colors */
+.under-budget {
+  color: var(--primary-green);
+}
+
+.over-budget {
+  color: #d32f2f;
+}
+
+.close-to-budget {
+  color: var(--money-gold);
 }
