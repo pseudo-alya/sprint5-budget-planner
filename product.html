@@ -5,30 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Expense Tracker & Budget Planner</title>
   <link rel="stylesheet" href="product.css">
-  <!-- Include Chart.js from CDN for rendering charts -->
+  <!-- Confetti library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+  <!-- Crack-screen overlay -->
+  <div id="crack-overlay" class="crack-overlay"></div>
+
   <header>
     <h1>Expense Tracker & Budget Planner</h1>
   </header>
   <main>
-      <!-- Budget Entry Section -->
-      <section id="budget-form-section">
-        <h2>Set Budget</h2>
-        <form id="budget-form">
-          <input type="number" id="budget-amount" placeholder="Total Budget" required>
-          <select id="budget-period" required>
-            <option value="">Select Period</option>
-            <option value="Weekly">Weekly</option>
-            <option value="Monthly">Monthly</option>
-          </select>
-          <button type="submit">Set Budget</button>
-        </form>
-        <div id="budget-display">
-          <p id="budget-info"></p>
-        </div>
-      </section>
+    <!-- Budget Entry Section -->
+    <section id="budget-form-section">
+      <h2>Set Budget</h2>
+      <form id="budget-form">
+        <input type="number" id="budget-amount" placeholder="Total Budget" required>
+        <select id="budget-period" required>
+          <option value="">Select Period</option>
+          <option value="Weekly">Weekly</option>
+          <option value="Monthly">Monthly</option>
+        </select>
+        <button type="submit">Set Budget</button>
+      </form>
+      <div id="budget-display">
+        <p id="budget-info"></p>
+      </div>
+    </section>
 
     <!-- Expense Entry Section -->
     <section id="expense-form-section">
@@ -56,9 +61,7 @@
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody>
-            <!-- Dynamically populated expense rows -->
-          </tbody>
+          <tbody></tbody>
         </table>
       </div>
     </section>
@@ -77,23 +80,22 @@
     </section>
 
     <!-- Chart Section -->
- <!-- Chart Section -->
-<section id="chart-section">
-  <h2>Expense Chart</h2>
-  <button id="toggle-chart">Toggle Chart Type</button>
-  <div class="chart-container">
-    <canvas id="expenseChart"></canvas>
-  </div>
-</section>
+    <section id="chart-section">
+      <h2>Expense Chart</h2>
+      <button id="toggle-chart">Toggle Chart Type</button>
+      <div class="chart-container">
+        <canvas id="expenseChart"></canvas>
+      </div>
+    </section>
 
-
-    <!-- CSV Export Section -->
+    <!-- CSV Export & Reset Section -->
     <section id="export-section">
-      <h2>Export Expenses</h2>
+      <h2>Export & Reset</h2>
       <button id="export-btn">Export to CSV</button>
+      <button id="reset-btn" class="reset-btn">Reset</button>
     </section>
   </main>
-  
+
   <script src="app.js"></script>
 </body>
 </html>
