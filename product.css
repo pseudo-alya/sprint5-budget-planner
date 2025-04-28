@@ -197,3 +197,37 @@ button:hover {
     font-size: 1.4rem;
   }
 }
+
+/* Crack-screen overlay */
+.crack-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Update the path to your crack image or use a placeholder */
+  background: url('crack.png') center/cover no-repeat;
+  /* Fallback background in case image doesn't load */
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.crack-overlay.visible {
+  opacity: 1;
+}
+
+.crack-overlay.hidden {
+  opacity: 0;
+}
+
+/* Reset button styling */
+.reset-btn {
+  margin-top: 1rem;
+  background: #d32f2f;
+}
+.reset-btn:hover {
+  background: #b71c1c;
+}
